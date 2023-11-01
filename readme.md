@@ -24,10 +24,6 @@ In this example the timeout step is 10 (game over after 10 steps)
 
 <img src="assets/maze_environment.png" alt= “” width="600px" >
 
-![w:200](assets/maze_environment.png)
-   
-<img src="http://i.imgur.com/Jjwsc.jpg" alt="エビフライトライアングル" title="サンプル">
-
 #### 2. generate maze dataset
 run the following command to generate random agent maze dataset
 (randomly choose action in uniform distribution).    
