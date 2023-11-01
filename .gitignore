@@ -10,7 +10,6 @@ slurm/config.sh
 slurm/*sandbox*
 *.img
 slurm-*.out
-*.png
 *.pdf
 *.pkl
 mjkey.txt
