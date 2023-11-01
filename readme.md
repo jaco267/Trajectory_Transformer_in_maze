@@ -1,7 +1,7 @@
 ### Trajectory transformer in maze (mazeGPT)    
 This repo implement [Trajectory transformer](https://github.com/jannerm/trajectory-transformer) in maze environment.   
 This implementaion is self-contained, so you don't need to install openAI gym or d4rl.    
-The maze environment is in the maze folder.        
+The maze environment is in the maze folder, modified from [mctx_learning_demo](https://github.com/kenjyoung/mctx_learning_demo)        
    
 ```sh
 python --version
@@ -84,6 +84,5 @@ python my_conf_maze/plan.py --horizon 5 --beam_width 32  --seed 42
 ```sh
 #  sometimes it will stuck at the corner
 python my_conf_maze/plan.py --horizon 5 --beam_width 64  --seed 35
-python my_conf_maze/plan.py --horizon 8 --beam_width 256  --seed 35
 python my_conf_maze/plan.py --horizon 5 --beam_width 64  
 ```
