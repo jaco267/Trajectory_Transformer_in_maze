@@ -1,7 +1,8 @@
-### [Trajectory transformer](https://github.com/jannerm/trajectory-transformer) in maze environment.   
+### Trajectory transformer in maze (mazeGPT)    
+This repo implement [Trajectory transformer](https://github.com/jannerm/trajectory-transformer) in maze environment.   
 This implementaion is self-contained, so you don't need to install openAI gym or d4rl.    
 The maze environment is in the maze folder.        
-
+   
 ```sh
 python --version
 # Python 3.10.12
@@ -22,7 +23,8 @@ In this example the timeout step is 10 (game over after 10 steps)
   
 
 <img src="assets/maze_environment.png" alt= “” width="600px" >
-   
+
+![w:200](assets/maze_environment.png)
    
 #### 2. generate maze dataset
 run the following command to generate random agent maze dataset
