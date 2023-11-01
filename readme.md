@@ -5,6 +5,10 @@ The maze environment is in the maze folder, modified from [mctx_learning_demo](h
 
 https://github.com/jaco267/Trajectory_Transformer_in_maze/assets/87292294/c3440c56-afa1-4e37-ab19-c071b56a1b21
    
+<img src="https://github.com/jaco267/Trajectory_Transformer_in_maze/assets/87292294/c3440c56-afa1-4e37-ab19-c071b56a1b21" alt= “” width="600px" >
+
+![w:500](https://github.com/jaco267/Trajectory_Transformer_in_maze/assets/87292294/c3440c56-afa1-4e37-ab19-c071b56a1b21)
+
 ```sh
 python --version
 # Python 3.10.12
