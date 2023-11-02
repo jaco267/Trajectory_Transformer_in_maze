@@ -1,19 +1,16 @@
-import sys
-import os
-cwd = os.getcwd()
-sys.path.append(cwd)
-from env_maze.env import ProcMaze
-from env_maze.utils import play_with_env
+from maze.env_maze.env import ProcMaze
+from maze.env_maze.utils import play_with_env
 
 from maze.data.data import VideoDataset
-from data.gen_data import generate_maze_data
-from data.utils import print_data_maze
-
+from maze.data.gen_data import generate_maze_data
+from maze.data.utils import print_data_maze
+from utils.save import savedata_config
 import pyrallis
-from config import TrainConfig
+from config_data import DataConfig
 @pyrallis.wrap()    
-def main(c: TrainConfig):
+def main(c: DataConfig):
   print(c)
+  
   env = ProcMaze(grid_size=c.w_h,device='cpu',timeout=c.time_out)
   if c.mode == "play":	play_with_env(env)
   if c.mode == "gen": 
@@ -27,6 +24,7 @@ def main(c: TrainConfig):
   data = dataset.get_data()  #{obs(bs,ch,4,4), action(bs)}
   # data[11]
   # data[19]
+  savedata_config(savepath=(c.data_path,'data_config.pkl'),args=c)
   print_data_maze(c,data,idx=11)
   print("""
 ---------type the following code----------

@@ -16,8 +16,8 @@ class PlanConfig:
     device:str = "cuda"; 
     seed:int = None;
     plan_freq:int = 1
-    horizon:int = 4#15   #?? 15 is two long and it will fail
-    beam_width:int = 24#128
+    horizon:int = 15   
+    beam_width:int = 128
     n_expand:int = 2
     enable_breakpoint:bool = True
     k_obs:int = 1
@@ -32,6 +32,7 @@ class PlanConfig:
     vis_freq:int = 50
     exp_name:str = watch(args_to_watch)  
     prefix:str = 'plans/defaults/'
+    gpt_folder:str = 'logs/maze/gpt/pretrained'
     suffix:str = '0'
     verbose:bool = True
     savepath:str = None  #post _init 

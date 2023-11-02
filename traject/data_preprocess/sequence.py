@@ -56,7 +56,7 @@ def get_dataset(dataset):
     return obs_flat_b, act_b,next_obs_b,rew_b,term_b,realterm_b
 class SequenceDataset(torch.utils.data.Dataset):
   def __init__(self, data_path,  N=50, sequence_length=250, step=10, 
-               discount=0.99, max_path_length=11, penalty=None, device='cuda:0'):
+               discount=0.99, max_path_length=11):
     print(f'[datasets/sequence_] Seq len: {sequence_length}, Step: {step}, Max path len: {max_path_length}')       
     print(f'[ datasets/sequence_ ] Loading...', end=' ', flush=True)
     '''

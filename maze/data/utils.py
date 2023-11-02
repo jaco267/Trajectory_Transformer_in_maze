@@ -1,7 +1,7 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from config import TrainConfig
+    from config_data import DataConfig
 from dataclasses import dataclass
 @dataclass
 class Channel:
@@ -19,7 +19,7 @@ def merge_maze_channel(raw_maze_map):
    maze += 6*raw_maze_map[chan.goal]
    return maze
 
-def print_data_maze(c:TrainConfig,buf,idx):
+def print_data_maze(c:DataConfig,buf,idx):
    
    obs = buf['observations'][idx]; 
    action = buf['actions'][idx];

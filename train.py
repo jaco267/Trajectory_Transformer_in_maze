@@ -8,21 +8,22 @@ import traject.utils as utils
 from traject.data_preprocess.sequence import SequenceDataset
 from traject.models.transformers import GPT
 import pyrallis    #nice cmd config tool
-from utils.save import savedata_config
+from utils.save import savedata_config,load_data_config
 from config_train import TrainConfig, GPT_config,Trainer_config  ##*must include these
+# from config_data import DataConfig
 from dataclasses import dataclass
 import os
 from traject.utils.serialization import mkdir
-
 @pyrallis.wrap()    
 def main(args: TrainConfig):
+  # dargs:DataConfig = load_data_config(args.data_path,'data_config.pkl')
+  #data_args
   if mkdir(args.savepath): print(f'[ utils/setup ] Made savepath: {args.savepath}')
   print('####### dataset #######')
   dataset = SequenceDataset(data_path=args.data_path,
             N=args.N,sequence_length=args.sequence_length,
             step=args.step,discount=args.discount,
             max_path_length=args.max_path_length,  #todo  this is weird
-            penalty=args.termination_penalty,
         )
   print(f'Dataset size: {len(dataset)}, \
 dim {dataset.observation_dim, dataset.action_dim,dataset.joined_dim}') 

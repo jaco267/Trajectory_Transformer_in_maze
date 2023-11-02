@@ -1,13 +1,13 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from config import TrainConfig
+    from config_data import DataConfig
 import torch as tc
-from data.utils import chan
+from maze.data.utils import chan
 import numpy as np
 import os
 
-def get_init_buffer(c:TrainConfig,n_steps):
+def get_init_buffer(c:DataConfig,n_steps):
   if c.gen_mode == "3chan":
     # 3 channel [goal,pos,wall]	
     buf_obs    = tc.zeros(n_steps, 3, c.w_h, c.w_h, dtype=tc.float32) 
@@ -31,7 +31,7 @@ def set_buf_obs_1chan(buf_obs,file_local_idx,goal,wall_grid,pos):
   buf_obs[file_local_idx,goal[0],goal[1]] += 4  #goal is 4
   buf_obs[file_local_idx,pos[0] ,pos[1]]  += 2  #pos is 2
   buf_obs[file_local_idx,:,:]  += wall_grid   #wall_grid is 1
-def generate_maze_data(c:TrainConfig,env):
+def generate_maze_data(c:DataConfig,env):
   '''generate data of [(bs,chan,seq_len,h,w)]*file_siz in each file'''
   data_folder = c.data_path 	
   os.makedirs(data_folder,exist_ok=True);  

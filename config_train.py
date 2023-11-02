@@ -44,7 +44,6 @@ class TrainConfig:
     savepath:str = 'logs/maze/gpt/pretrained' 
     data_path:str =  'datasets/maze/'
     N:int=N; #* vocab size   
-    termination_penalty:int = -100;  
     sequence_length:int = subsampled_sequence_length*step  #10*1=10
     step:int = step;  discount:float = 0.99;
     #** ---transformer---

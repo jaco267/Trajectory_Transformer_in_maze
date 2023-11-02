@@ -3,7 +3,7 @@ from dataclasses import dataclass
 
 
 @dataclass
-class TrainConfig:
+class DataConfig:
   data_path:str = 'datasets/maze/'
   mode:str="gen"  #play or gen
   gen_mode:str="1chan"#"3chan"

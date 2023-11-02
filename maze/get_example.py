@@ -5,9 +5,9 @@ sys.path.append(cwd)
 from maze.data.data import VideoDataset
 
 import pyrallis
-from config import TrainConfig
+from config_data import DataConfig
 @pyrallis.wrap()    
-def main(c: TrainConfig):
+def main(c: DataConfig):
   data = VideoDataset(c.data_path).get_data()
   # print_data_maze(data[11])
   

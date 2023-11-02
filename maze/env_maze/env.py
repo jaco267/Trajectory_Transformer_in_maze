@@ -22,6 +22,16 @@ class ProcMaze:
         self.channels ={'player':0,'goal':1,'wall':2,'empty':3}
         self.device = device
         self.seed = seed
+    @property
+    def action_map_dict(self):
+        action_map = {
+            0:'no_op',
+            1:'up',
+            2:'left',
+            3:'down',
+            4:'right'
+        }
+        return action_map 
     def reset(self)->any:
         def push(stack, top, x):
             stack[top] = x

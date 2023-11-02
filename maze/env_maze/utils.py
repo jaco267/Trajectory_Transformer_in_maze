@@ -1,4 +1,3 @@
-from env_maze.env import ProcMaze
 import torch as tc
 
 def play_with_env(env):
