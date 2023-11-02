@@ -6,17 +6,15 @@ import re
 class VideoDataset():
     """ Generic dataset for videos files stored in folders
     Returns BCTHW videos in the range [-0.5, 0.5] """
-    def __init__(self,data_path, train=True):
+    def __init__(self,data_path):
         """data_folder: path to video folder. should contain a 'train' and a 'test' directory, each with corresponding videos stored
         sequence_length: length of extracted video sequences
         """
         super().__init__()
-        self.train:bool = train; 
         # pdb.set_trace()
-        self.mode =  'train' if train else 'test'
-        self.folder = osp.join(data_path, self.mode)
+        self.folder = data_path
         files = glob.glob(osp.join(self.folder, '**', f'*.pt'), recursive=True)
-        # ['datasets/maze/train/buf1.pt', 'datasets/maze/train/buf0.pt']
+        # ['datasets/maze/buf1.pt', 'datasets/maze/buf0.pt']
         self.file_list = list(set([get_parent_dir(f) for f in files]))
         # self.file_list.sort()  #* ['buf0.pt', 'buf1.pt']
         self.file_list = sorted(self.file_list, key=lambda s: int(re.search(r'\d+', s).group()))

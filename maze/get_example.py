@@ -8,7 +8,7 @@ import pyrallis
 from config import TrainConfig
 @pyrallis.wrap()    
 def main(c: TrainConfig):
-  data = VideoDataset(c.data_path,train=True).get_data()
+  data = VideoDataset(c.data_path).get_data()
   # print_data_maze(data[11])
   
   print(data.keys())

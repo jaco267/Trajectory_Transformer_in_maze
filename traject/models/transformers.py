@@ -21,7 +21,7 @@ class CausalSelfAttention(nn.Module):
         self.resid_drop = nn.Dropout(cfg.resid_pdrop)
         # output projection
         self.proj = nn.Linear(cfg.n_embd, cfg.n_embd)
-        # causal mask to ensure that attention is only applied to the left in the input sequence
+        # causal mask to ensure that attention is only applied to the left in the input sequence_
         self.register_buffer("mask", torch.tril(torch.ones(cfg.block_size, cfg.block_size))
                                      .view(1, 1, cfg.block_size, cfg.block_size))
         '''

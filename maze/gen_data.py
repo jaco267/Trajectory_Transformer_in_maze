@@ -17,16 +17,10 @@ def main(c: TrainConfig):
   env = ProcMaze(grid_size=c.w_h,device='cpu',timeout=c.time_out)
   if c.mode == "play":	play_with_env(env)
   if c.mode == "gen": 
-    generate_maze_data(c,env,mode='train')
-    generate_maze_data(c,env,mode='test')
-    dataset = VideoDataset(c.data_path,train=True)
-  elif c.mode == "gen_test":
-    generate_maze_data(c,env,mode='test')
-    dataset = VideoDataset(c.data_path,train=False)
+    generate_maze_data(c,env)
+    dataset = VideoDataset(c.data_path)
   elif c.mode == "view_train":
-    dataset = VideoDataset(c.data_path,train=True)
-  elif c.mode == "view_test":
-    dataset = VideoDataset(c.data_path,train=False)
+    dataset = VideoDataset(c.data_path)
   else:
     raise Exception('dont have this option...') 
   # print(data[0])

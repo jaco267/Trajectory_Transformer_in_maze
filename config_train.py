@@ -63,7 +63,7 @@ class TrainConfig:
         self.gpt_config.observation_dim = obs_dim  #17
         self.gpt_config.action_dim = act_dim       #6
         self.gpt_config.transition_dim = trans_dim  #transition_dim = 25
-        # joined_dim is in datasets/sequence.py #joined_dim = obs_dim+act_dim+reward_dim+value_dim
+        # joined_dim is in traj/datasets/sequence_.py #joined_dim = obs_dim+act_dim+reward_dim+value_dim
         print(f'Joined dim: {trans_dim} obs: {obs_dim}, action: {act_dim}) | Block: {block_size}' )
         warmup_tokens = dataset_len*block_size
         final_tokens = 20 * warmup_tokens

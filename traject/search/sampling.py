@@ -54,7 +54,7 @@ def sort_2d(x):
 def forward(model, x, max_block=None, allow_crop=True, crop_increment=None, **kwargs):
     '''
         A wrapper around a single forward pass of the transformer.
-        Crops the input if the sequence is too long.
+        Crops the input if the sequence_ is too long.
 
         x : tensor[ batch_size x sequence_length ]
     '''
@@ -137,7 +137,7 @@ def sample_n(model, x, N,mode=None,  **sample_kwargs):
     for n in range(N):
         indices, p = sample(model, x,mode=mode, **sample_kwargs)
 
-        ## append to the sequence and continue
+        ## append to the sequence_ and continue
         ## [ batch_size x (sequence_length + n) ]
         x = torch.cat((x, indices), dim=1)
 

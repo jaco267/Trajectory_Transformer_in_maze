@@ -30,7 +30,7 @@ class QuantileDiscretizer:
 			assert np.all(x[:,:16]>=0)
 			# print(x)
 			assert np.all(x[:,17:]<=0)  
-		#** called by my_conf_maze/datasets/sequence.py self.discretizer.discretiz
+		#** called by traject/datasets/sequence_.py self.discretizer.discretiz
 		#x(10,19) = (seq_len,trans_dim)
 		
 		

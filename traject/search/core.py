@@ -126,7 +126,7 @@ def beam_plan( model, value_fn, x,
     ## [ batch_size x n_steps x transition_dim ]
     x = x[:, -n_steps:]
 
-    ## return best sequence
+    ## return best sequence_
     argmax = values.argmax()  #argmax
     best_sequence = x[argmax]
     return best_sequence

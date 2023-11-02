@@ -5,7 +5,7 @@ sys.path.append(cwd)
 import torch
 
 import traject.utils as utils
-from datasets.sequence import SequenceDataset
+from traject.data_preprocess.sequence import SequenceDataset
 from traject.models.transformers import GPT
 import pyrallis    #nice cmd config tool
 from utils.save import savedata_config
@@ -39,8 +39,7 @@ dim {dataset.observation_dim, dataset.action_dim,dataset.joined_dim}')
   trainer = utils.Trainer(args.trainer_config)
   ###### main loop ######
   ## scale number of epochs to keep number of updates constant
-  n_epochs = int(1e6 / len(dataset) * args.n_epochs_ref)     #  1e6 / len(dataset) * 50 ~= 1*50 = 50
-  #              1e6/998999 ~=1.001 * 50
+  n_epochs =  args.n_epochs_ref     
   save_freq = int(n_epochs // args.n_saves)
   for epoch in range(n_epochs):  #50
       print(f'\nEpoch: {epoch} / {n_epochs} ')

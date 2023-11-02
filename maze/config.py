@@ -18,6 +18,5 @@ class TrainConfig:
         wall   pos   goal
   '''
   n_steps:int = 3_000  #1000_000 
-  n_steps_test:int = 2_000
   w_h:int = 4;    #resolution
   time_out:int = 10

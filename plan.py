@@ -3,7 +3,7 @@ cwd = os.getcwd(); sys.path.append(cwd)
 import json; from os.path import join
 
 import traject.utils as utils
-from datasets.sequence import SequenceDataset
+from traject.data_preprocess.sequence import SequenceDataset
 from traject.search import ( beam_plan, make_prefix, extract_actions, update_context, )
 from traject.models.transformers import GPT
 import pyrallis
@@ -110,7 +110,7 @@ def main(args: PlanConfig):
     ## concatenate previous transitions and current observations to input to model
     prefix = make_prefix(discretizer, context, obss, args.prefix_context)
     # # [1,26~196]                    []      (26,)          True
-    ## sample sequence from model beginning with `prefix`
+    ## sample sequence_ from model beginning with `prefix`
     sequence = beam_plan(
         gpt, value_fn, prefix,
         args.horizon, args.beam_width, args.n_expand, observation_dim, action_dim,
