@@ -5,7 +5,7 @@ sys.path.append(cwd)
 import torch
 
 import traject.utils as utils
-from my_conf_maze.datasets.sequence import SequenceDataset
+from datasets.sequence import SequenceDataset
 from traject.models.transformers import GPT
 import pyrallis    #nice cmd config tool
 from utils.save import savedata_config

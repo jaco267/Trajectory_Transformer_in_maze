@@ -24,8 +24,8 @@ class VideoDataset():
     def file_num(self):  return len(self.file_list)  
     def get_data(self):
       buf_object = tc.load(f"{self.folder}/{self.file_list[0]}")
-      buf_obs = buf_object['obs'].numpy()  #[] len file_size , each with  [3,seq,4,4]
-      buf_action = buf_object['action'].numpy()  #[] len file_size , each with [seq]
+      buf_obs = buf_object['obs'].numpy()  #[] len n_steps , each with  [3,seq,4,4]
+      buf_action = buf_object['action'].numpy()  #[] len n_steps , each with [seq]
       buf_term = buf_object['term'].numpy() 
       buf_reward = buf_object['reward'].numpy()   #* always 1
       buf_t = buf_object['t'].numpy() 

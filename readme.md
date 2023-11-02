@@ -36,7 +36,7 @@ In this example we'll generate a maze dataset with 1000_000 steps.
 It will take about 10 minutes  
   
 ```sh
-python maze/gen_data.py --mode gen --n_steps 1000_000 --file_size 1000_000 --time_out 50
+python maze/gen_data.py --mode gen --n_steps 1000_000 --time_out 50
 ```   
    
 #### 3. train the agent 

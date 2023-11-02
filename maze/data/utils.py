@@ -18,14 +18,6 @@ def merge_maze_channel(raw_maze_map):
    maze += 3*raw_maze_map[chan.pos]
    maze += 6*raw_maze_map[chan.goal]
    return maze
-# def print_map(buf_obs,buf_action,buf_term,buf_t,file_local_idx):
-#    raw_maze_map = buf_obs[file_local_idx]
-#    raw_next_action  = buf_action[file_local_idx]
-#    raw_term = buf_term[file_local_idx]
-#    raw_t  = buf_t[file_local_idx]
-#    maze = merge_maze_channel(raw_maze_map)
-
-#    print(f"{maze} action: {Action_dict[raw_next_action.item()]}, term: {raw_term.item()} t:{raw_t.item()}")
 
 def print_data_maze(c:TrainConfig,buf,idx):
    

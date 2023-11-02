@@ -3,7 +3,7 @@ cwd = os.getcwd(); sys.path.append(cwd)
 import json; from os.path import join
 
 import traject.utils as utils
-from my_conf_maze.datasets.sequence import SequenceDataset
+from datasets.sequence import SequenceDataset
 from traject.search import ( beam_plan, make_prefix, extract_actions, update_context, )
 from traject.models.transformers import GPT
 import pyrallis
@@ -65,8 +65,7 @@ def main(args: PlanConfig):
   ####### models ########  rl envs offline_data
   gpt_folder = 'logs/maze/gpt/pretrained'
   targs = load_data_config(gpt_folder, 'train_config.pkl')
-  if args.seed != None:
-    torch.random.manual_seed (args.seed)
+  if args.seed != None:  torch.random.manual_seed (args.seed)
   #train_config
   sequence_length = targs.subsampled_sequence_length * targs.step  #10*1 # same as script/train.py
   dataset = SequenceDataset(data_path=targs.data_path,N=targs.N,
@@ -75,7 +74,7 @@ def main(args: PlanConfig):
             sequence_length=sequence_length,
             step=targs.step,discount=targs.discount)
   config, state, gpt_epoch = load_model(gpt_folder, 
-        model_file='train_config.pkl', epoch=args.gpt_epoch)  #todo  merge two train config
+            model_file='train_config.pkl', epoch=args.gpt_epoch)  #todo  merge two train config
   _ = config.update_config(len(dataset),# fix bug of pyrallis (reset the gpt config)
                 dataset.observation_dim, dataset.action_dim, dataset.joined_dim)
   # breakpoint()#config.gpt_config.block_size #config.observation_dim=7 #config.n_layer

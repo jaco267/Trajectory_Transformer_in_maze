@@ -17,14 +17,7 @@ class TrainConfig:
         0 0  | 1 0 | 0 1 
         wall   pos   goal
   '''
-  n_steps:int = 3_000  #1000_000  # should be multiple of file_sizes
-  file_size:int = 3_000  ## will generate n_steps/(file_size*seq_len)'s file
-  # len(data) = file_size*file_num==16_000*1=16_000
-  
+  n_steps:int = 3_000  #1000_000 
   n_steps_test:int = 2_000
-  file_size_test:int = 2_000
-  
-  chan:int = 3;   #goal,pos,wall	
   w_h:int = 4;    #resolution
-  # print:bool = True
   time_out:int = 10
