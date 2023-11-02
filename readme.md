@@ -47,16 +47,16 @@ This will takes about 15 min on a RTX3060 gpu.
    
 ```sh
 #  It will generate /logs/maze/gpt/pretrained/state_1.pt
-python my_conf_maze/train.py --max_path_length 61  --n_epochs_ref 1  --n_saves 1   
+python train.py --max_path_length 61  --n_epochs_ref 1  --n_saves 1   
                                #50+10+1 ini_state #maze step max_len +subseq_len+1
 ```
 ### 4. test the agent (planning) 
 run the following command to watch the agent play with the maze   
    
 ```sh
-python my_conf_maze/plan.py --horizon 5 --beam_width 32  --seed 43 --enable_breakpoint False
+python plan.py --horizon 5 --beam_width 32  --seed 43 --enable_breakpoint False
 
-python my_conf_maze/plan.py --horizon 5 --beam_width 32  --seed 42
+python plan.py --horizon 5 --beam_width 32  --seed 42
 #press c to continue 
 ```
 
@@ -86,6 +86,6 @@ python my_conf_maze/plan.py --horizon 5 --beam_width 32  --seed 42
    
 ```sh
 #  sometimes it will stuck at the corner
-python my_conf_maze/plan.py --horizon 5 --beam_width 64  --seed 35
-python my_conf_maze/plan.py --horizon 5 --beam_width 64  
+python plan.py --horizon 5 --beam_width 64  --seed 35
+python plan.py --horizon 5 --beam_width 64  
 ```
