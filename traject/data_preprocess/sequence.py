@@ -3,7 +3,7 @@ import torch
 from utils import discretization
 from utils.arrays import to_torch
 from maze.data.data import VideoDataset
-
+from config_data import DataConfig
 
 def segment(observations,  #(bs,17+6)=(bs,23)=(bs,obs+action)  #bs==999999
             term_b,     #(bs,1)
@@ -55,10 +55,11 @@ def get_dataset(dataset):
            term_b.shape,">>>>")
     return obs_flat_b, act_b,next_obs_b,rew_b,term_b,realterm_b
 class SequenceDataset(torch.utils.data.Dataset):
-  def __init__(self, data_path,  N=50, sequence_length=250, step=10, 
+  def __init__(self,dargs, data_path,  N=50, sequence_length=250, step=10, 
                discount=0.99, max_path_length=11):
     print(f'[datasets/sequence_] Seq len: {sequence_length}, Step: {step}, Max path len: {max_path_length}')       
     print(f'[ datasets/sequence_ ] Loading...', end=' ', flush=True)
+    self.dargs:DataConfig = dargs
     '''
     self.env = env = load_environment(env);self.device = device  #* d4rl
     dataset = qlearning_dataset_with_timeouts(env.unwrapped, terminate_on_end=True) #* d4rl
@@ -149,7 +150,7 @@ np.ndarray(999999,17) (999999,6)  (999999,17)      (999999,1) (999999,1)     (99
      # print(self.joined_raw.shape,"hello") #(999999,23+1+1) = (999999,25)
     print("ok?3")
     
-    self.discretizer = discretization.QuantileDiscretizer(self.joined_raw, N)
+    self.discretizer = discretization.QuantileDiscretizer(self.dargs, self.joined_raw, N)
   def __len__(self):    return len(self.indices)
   def __getitem__(self, idx:int):
     ##self.indices[(ind:0~1000,i:0~999,i:10~999+10 ),...()] len(1000000-1001)

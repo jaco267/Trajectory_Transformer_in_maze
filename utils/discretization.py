@@ -1,11 +1,12 @@
 import numpy as np
 import torch
-import pdb
 
 from .arrays import to_np, to_torch
-
+from config_data import DataConfig
 class QuantileDiscretizer:
-	def __init__(self, data, N):
+	def __init__(self,dargs, data, N):
+		self.dargs:DataConfig = dargs
+		self.w_h_2 = dargs.w_h ** 2
 		self.data = data   # (999999,17+6+1+1) = (999999,25)  
 		self.N:int = N     #100
 		n_points_per_bin = int(np.ceil(len(data) / N)) #10000 = 999999/100
@@ -23,17 +24,15 @@ class QuantileDiscretizer:
 		assert torch.is_tensor(x) == False  #should be np array
 		if x.ndim == 1:  x = x[None]## enforce batch mode
 		if only_obs:
-			assert x.shape[-1] == 16  #obs(16)
+			assert x.shape[-1] == self.w_h_2 
 			assert np.all(x>=0)
 		else: 
-			assert x.shape[-1] == 19  #obs(16),action(1),reward(1),value(1)
-			assert np.all(x[:,:16]>=0)
+			assert x.shape[-1] == self.w_h_2 + 3  #obs(16),action(1),reward(1),value(1)
+			assert np.all(x[:,:(self.w_h_2+1)]>=0)  #obs , action  >= 0
 			# print(x)
-			assert np.all(x[:,17:]<=0)  
+			assert np.all(x[:,(self.w_h_2+1):]<=0)    #reward value<=0
 		#** called by traject/datasets/sequence_.py self.discretizer.discretiz
 		#x(10,19) = (seq_len,trans_dim)
-		
-		
 		## [ N x B x observation_dim ]
 		  #(1000,25)->(1,1000,25), (101,25) -> (101,1,25)
 		x2 = x.copy().astype(np.int64)  
@@ -48,7 +47,7 @@ class QuantileDiscretizer:
 		#* called at plan reconstruct from output (token to value)
 		#  remove this (todo)
 		if torch.is_tensor(indices): indices = to_np(indices)
-		assert indices.shape[-1] == 19
+		assert indices.shape[-1] == self.w_h_2 + 3
 		assert len(indices.shape) == 2
 		assert np.all(indices>=0)
 		

@@ -5,10 +5,11 @@ if TYPE_CHECKING:
 
 import numpy as np
 import torch
-import pdb
+
 
 from .. import utils
 from .sampling import sample_n, get_logp, sort_2d
+from config_data import DataConfig
 
 REWARD_DIM = VALUE_DIM = 1
 
@@ -20,10 +21,13 @@ action_map = {
    4:'right'
 }
 def to_maze(x):
-    print(x[:16].reshape(4,4),action_map[x[16].item()])
+    w_h_2 = x.shape[0] -1 
+
+    w_h = int(w_h_2**0.5)
+    print(x[:w_h_2].reshape(w_h,w_h),x[w_h_2].item(),action_map[x[w_h_2].item()])
 
 @torch.no_grad()
-def beam_plan( model, value_fn, x,
+def beam_plan(dargs, model, value_fn, x,
     n_steps,  #horizon=5
     beam_width,  #64
     n_expand, #2
@@ -34,8 +38,9 @@ def beam_plan( model, value_fn, x,
     verbose=True, previous_actions=None,
 ):
     '''x : tensor[ 1 x input_sequence_length ]'''
-    # print(to_maze(x))
-    
+    dargs:DataConfig = dargs
+    w_h = dargs.w_h
+    warv = w_h**2 + 3 # w_h**2, action,reward value
     inp = x.clone()
     # convert max number of transitions to max number of tokens
     transition_dim = observation_dim + action_dim + REWARD_DIM + VALUE_DIM
@@ -72,20 +77,11 @@ def beam_plan( model, value_fn, x,
         ## optionally, use a percentile or mean of the reward and
         ## value distributions instead of sampled tokens
         r_t, _ = value_fn(r_probs)
-        # if r_probs[0,0,1] <0.9 and r_probs[0,0,1]<0.01:
-        #     breakpoint()
         # QuantileDiscretizer.value_expectation
         # -r_probs[:,0,:]@torch.arange(101,dtype=torch.float32,device='cuda')
         print(torch.where(~torch.isclose(r_t,torch.tensor(-1,dtype=torch.float32))))
         V_t = -r_probs[:,1,:]@torch.arange(101,dtype=torch.float32,device='cuda')
         assert V_t.shape == r_t.shape
-        # breakpoint()
-        #r_probs[:,1,:]  #128,101
-        #r_probs[0,1,:]  #101
-        #r_probs[:5,1,:].cpu()@torch.arange(101,dtype=torch.float32)
-        #V_t[:5]
-        #x[0:,-1]
-        
         ## update rewards tensor
         rewards[:, t] = r_t
         rewards[:, t+1] = V_t
@@ -95,30 +91,35 @@ def beam_plan( model, value_fn, x,
         ## get `beam_width` best actions
         values, inds = torch.topk(values, beam_width)
         ## index into search candidates to retain `beam_width` highest-reward sequences
+        # breakpoint() 
         x = x[inds]
         rewards = rewards[inds]
         ## sample next observation (unless we have reached the end of the planning horizon)
+        # breakpoint() #x[:,-3]
         if t < n_steps - 1:
             x, _ = sample_n(model, x, observation_dim, topk=k_obs, cdf=cdf_obs, **sample_kwargs)
     
         ## logging
-    #     print(f"x:{list(x.shape)} vmin {values.min()} vmax: {values.max()}\
+        print(f"x:{list(x.shape)} vmin {values.min()} vmax: {values.max()}\
     # vtmin {V_t.min()} vtmax {V_t.max()} discount {discount}")
-        progress.update({
-            'x': list(x.shape),
-            'vmin': values.min(), 'vmax': values.max(),
-            'vtmin': V_t.min(), 'vtmax': V_t.max(),
-            'discount': discount
-        })
+        # progress.update({
+        #     'x': list(x.shape),
+        #     'vmin': values.min(), 'vmax': values.max(),
+        #     'vtmin': V_t.min(), 'vtmax': V_t.max(),
+        #     'discount': discount
+        # })
+
     #x.shape (64,114) = (64, 6*19)
     # x[:,16]
-    #to_maze(x[0,0:19-2])                  x[0,:16].reshape(4,4) action_map(x[0,17].item())
-    #to_maze(x[0,19:19*2-2]) 
-    #to_maze(x[0,19*2:19*3-2]) 
-    #to_maze(x[0,19*3:19*4-2]) 
-    #to_maze(x[0,19*4:19*5-2]) 
-    progress.stamp()
-
+    # to_maze(x[0,0:warv-2]) #                  x[0,:16].reshape(4,4) action_map(x[0,17].item())
+    # to_maze(x[0,warv:warv*2-2]) 
+    # to_maze(x[0,warv*2:warv*3-2]) 
+    # to_maze(x[0,warv*3:warv*4-2]) 
+    # to_maze(x[0,warv*4:warv*5-2]) 
+    for i in range(3):
+        to_maze(x[0,warv*i:warv*(i+1)-2])
+    # progress.stamp()
+    
     ## [ batch_size x (n_context + n_steps) x transition_dim ]
     x = x.view(beam_width, -1, transition_dim)
 

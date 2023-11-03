@@ -14,6 +14,8 @@ args_to_watch = [
 class PlanConfig:
     gpt_epoch:str = "latest";    
     device:str = "cuda"; 
+    simulation_game_num:int = 1;
+    timeout:int = 50;
     seed:int = None;
     plan_freq:int = 1
     horizon:int = 15   
@@ -25,12 +27,13 @@ class PlanConfig:
     cdf_obs:int = None
     cdf_act:float = None#0.6
     percentile:str = "mean"
-
+    
     max_context_transitions:int = 5
     prefix_context:bool = True
 
     vis_freq:int = 50
     exp_name:str = watch(args_to_watch)  
+    data_path:str =  'datasets/maze/'
     prefix:str = 'plans/defaults/'
     gpt_folder:str = 'logs/maze/gpt/pretrained'
     suffix:str = '0'

@@ -36,7 +36,7 @@ In this example we'll generate a maze dataset with 1000_000 steps.
 It will take about 10 minutes  
   
 ```sh
-python gen_data.py --mode gen --n_steps 300_000 --time_out 50
+python gen_data.py --mode gen --n_steps 1000_000 --time_out 50
 ```   
    
 #### 3. train the agent 
@@ -88,4 +88,8 @@ python plan.py --horizon 5 --beam_width 32  --seed 42
 #  sometimes it will stuck at the corner
 python plan.py --horizon 5 --beam_width 64  --seed 35
 python plan.py --horizon 5 --beam_width 64  
+#run 30 games and get avg return 
+python plan.py --horizon 5 --beam_width 64  --seed 36 --enable_breakpoint False --simulation_game_num 30 --timeout 50
+=====avg_score=-18.8=====
+# [-2, -1, -50, -50, -1, -2, -4, -2, -5, -50, -2, -50, -1, -3, -50, -3, -3, -50, -1, -50, -5, -50, -50, -1, -12, -50, -1, -3, -1, -11]
 ```

@@ -10,17 +10,15 @@ from traject.models.transformers import GPT
 import pyrallis    #nice cmd config tool
 from utils.save import savedata_config,load_data_config
 from config_train import TrainConfig, GPT_config,Trainer_config  ##*must include these
-# from config_data import DataConfig
-from dataclasses import dataclass
+from config_data import DataConfig
 import os
 from traject.utils.serialization import mkdir
 @pyrallis.wrap()    
 def main(args: TrainConfig):
-  # dargs:DataConfig = load_data_config(args.data_path,'data_config.pkl')
-  #data_args
+  dargs:DataConfig = load_data_config(args.data_path,'data_config.pkl')
   if mkdir(args.savepath): print(f'[ utils/setup ] Made savepath: {args.savepath}')
   print('####### dataset #######')
-  dataset = SequenceDataset(data_path=args.data_path,
+  dataset = SequenceDataset(dargs=dargs,data_path=args.data_path,
             N=args.N,sequence_length=args.sequence_length,
             step=args.step,discount=args.discount,
             max_path_length=args.max_path_length,  #todo  this is weird
@@ -29,7 +27,7 @@ def main(args: TrainConfig):
 dim {dataset.observation_dim, dataset.action_dim,dataset.joined_dim}') 
   #len  1000000-1001 #?965972
   print('######## model ########')    #todo make action_dim to 5
-  ##                             obs=16 , action = 1, joined=16+1+1+1 = 19 (obs action,reward,done)
+  ##                      obs=w_h**2 , action = 1, joined=w_h**2+1+1+1 = 19 (obs action,reward,done)
   args.update_config(len(dataset),dataset.observation_dim,dataset.action_dim,dataset.joined_dim)
   savedata_config(savepath=(args.savepath,'train_config.pkl'),args=args)#todo rename to train_config
   model = GPT(args.gpt_config).to(args.device);
