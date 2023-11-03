@@ -1,8 +1,7 @@
 import numpy as np
 import torch
-import pdb
 
-from ..utils.arrays import to_torch
+from utils.arrays import to_torch
 
 
 def make_prefix(discretizer, context, obs, prefix_context=True):

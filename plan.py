@@ -8,8 +8,10 @@ from config_data import DataConfig
 from config_plan import PlanConfig
 from maze.env_maze.env import ProcMaze
 from z_plan.utils import load_model
-from z_plan.main import main_loop
 from utils.save import load_data_config
+from z_plan.main import main_loop
+
+
 def maze_state_to_obs(maze_state):
   goal, wall_grid, pos, _ = maze_state
   wall_grid = wall_grid.to(torch.float32)

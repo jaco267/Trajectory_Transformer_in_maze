@@ -6,11 +6,9 @@ if TYPE_CHECKING:
 import numpy as np
 import torch
 
-
-from .. import utils
 from .sampling import sample_n, get_logp, sort_2d
 from config_data import DataConfig
-
+from config_plan import PlanConfig
 REWARD_DIM = VALUE_DIM = 1
 
 action_map = {
@@ -27,19 +25,23 @@ def to_maze(x):
     print(x[:w_h_2].reshape(w_h,w_h),x[w_h_2].item(),action_map[x[w_h_2].item()])
 
 @torch.no_grad()
-def beam_plan(dargs, model, value_fn, x,
-    n_steps,  #horizon=5
-    beam_width,  #64
-    n_expand, #2
+def beam_plan(dargs,args, model, value_fn, x,
     observation_dim, action_dim,
-    discount=0.99, max_context_transitions=None,
-    k_obs=None, k_act=None, k_rew=1,
-    cdf_obs=None, cdf_act=None, cdf_rew=None,
-    verbose=True, previous_actions=None,
+    discount=0.99, 
 ):
     '''x : tensor[ 1 x input_sequence_length ]'''
     dargs:DataConfig = dargs
+    args:PlanConfig = args
+    k_obs = args.k_obs
+    cdf_obs = args.cdf_obs
+    verbose = args.verbose
+    n_expand = args.n_expand #2
+    beam_width = args.beam_width #64
+    horizon = args.horizon  #5
+    max_context_transitions = args.max_context_transitions
     w_h = dargs.w_h
+
+
     warv = w_h**2 + 3 # w_h**2, action,reward value
     inp = x.clone()
     # convert max number of transitions to max number of tokens
@@ -50,11 +52,9 @@ def beam_plan(dargs, model, value_fn, x,
     ## repeat input for search
     x = x.repeat(beam_width, 1)  #(64,16) = (beam_width , obs)
     ## construct reward and discount tensors for estimating values
-    rewards = torch.zeros(beam_width, n_steps + 1, device=x.device)
-    discounts = discount ** torch.arange(n_steps + 1, device=x.device)
+    rewards = torch.zeros(beam_width, horizon + 1, device=x.device)
+    discounts = discount ** torch.arange(horizon + 1, device=x.device)
 
-    ## logging
-    progress = utils.Progress(n_steps) if verbose else utils.Silent()
     '''
     step 0                         1                        2 3 4 
      obs action reward value   obs action reward value  ,.....
@@ -62,7 +62,7 @@ def beam_plan(dargs, model, value_fn, x,
            23             25    42  48             50
         trans_dim == 25          trans_dim == 25     
     '''
-    for t in range(n_steps):
+    for t in range(horizon):
         ## repeat everything by `n_expand` before we sample actions
         x = x.repeat(n_expand, 1)  #(64*2,16)
         rewards = rewards.repeat(n_expand, 1)
@@ -79,7 +79,7 @@ def beam_plan(dargs, model, value_fn, x,
         r_t, _ = value_fn(r_probs)
         # QuantileDiscretizer.value_expectation
         # -r_probs[:,0,:]@torch.arange(101,dtype=torch.float32,device='cuda')
-        print(torch.where(~torch.isclose(r_t,torch.tensor(-1,dtype=torch.float32))))
+        # print(torch.where(~torch.isclose(r_t,torch.tensor(-1,dtype=torch.float32))))
         V_t = -r_probs[:,1,:]@torch.arange(101,dtype=torch.float32,device='cuda')
         assert V_t.shape == r_t.shape
         ## update rewards tensor
@@ -96,27 +96,14 @@ def beam_plan(dargs, model, value_fn, x,
         rewards = rewards[inds]
         ## sample next observation (unless we have reached the end of the planning horizon)
         # breakpoint() #x[:,-3]
-        if t < n_steps - 1:
+        if t < horizon - 1:
             x, _ = sample_n(model, x, observation_dim, topk=k_obs, cdf=cdf_obs, **sample_kwargs)
     
         ## logging
-        print(f"x:{list(x.shape)} vmin {values.min()} vmax: {values.max()}\
-    # vtmin {V_t.min()} vtmax {V_t.max()} discount {discount}")
-        # progress.update({
-        #     'x': list(x.shape),
-        #     'vmin': values.min(), 'vmax': values.max(),
-        #     'vtmin': V_t.min(), 'vtmax': V_t.max(),
-        #     'discount': discount
-        # })
-
-    #x.shape (64,114) = (64, 6*19)
-    # x[:,16]
-    # to_maze(x[0,0:warv-2]) #                  x[0,:16].reshape(4,4) action_map(x[0,17].item())
-    # to_maze(x[0,warv:warv*2-2]) 
-    # to_maze(x[0,warv*2:warv*3-2]) 
-    # to_maze(x[0,warv*3:warv*4-2]) 
-    # to_maze(x[0,warv*4:warv*5-2]) 
-    for i in range(3):
+        print(f"\rx:{list(x.shape)} vmin {values.min()} vmax: {values.max()}\
+    # vtmin {V_t.min()} vtmax {V_t.max()} discount {discount}",end='')
+    if verbose:
+      for i in range(horizon):
         to_maze(x[0,warv*i:warv*(i+1)-2])
     # progress.stamp()
     
@@ -125,7 +112,7 @@ def beam_plan(dargs, model, value_fn, x,
 
     ## crop out context transitions
     ## [ batch_size x n_steps x transition_dim ]
-    x = x[:, -n_steps:]
+    x = x[:, -horizon:]
 
     ## return best sequence_
     argmax = values.argmax()  #argmax

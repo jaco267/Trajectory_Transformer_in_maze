@@ -27,7 +27,7 @@ class PlanConfig:
     cdf_obs:int = None
     cdf_act:float = None#0.6
     percentile:str = "mean"
-    
+    verbose:bool = False
     max_context_transitions:int = 5
     prefix_context:bool = True
 
@@ -37,7 +37,6 @@ class PlanConfig:
     prefix:str = 'plans/defaults/'
     gpt_folder:str = 'logs/maze/gpt/pretrained'
     suffix:str = '0'
-    verbose:bool = True
     savepath:str = None  #post _init 
     def __post_init__(self):
         self.exp_name = self.exp_name(self)  #plans/defaults/freq1_H5_beam32

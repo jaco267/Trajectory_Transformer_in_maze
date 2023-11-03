@@ -1,6 +1,5 @@
 import traject.utils as utils
-from traject.search import ( beam_plan, make_prefix, extract_actions, update_context, )
-from traject.models.transformers import GPT
+from z_plan.search import ( beam_plan, make_prefix, extract_actions, update_context, )
 import math
 import torch
 import numpy as np
@@ -24,7 +23,6 @@ def main_loop(dargs,args,env_maze,timeout,dataset,gpt_model):
   #######################
   dargs:DataConfig = dargs
   w_h = dargs.w_h
-  w_h_2 = w_h**2
   maze_state = env_maze.reset();
   obss = maze_state_to_obs(maze_state)
   #***
@@ -39,12 +37,8 @@ def main_loop(dargs,args,env_maze,timeout,dataset,gpt_model):
       prefix = make_prefix(discretizer, context, obss, args.prefix_context)
       # # [1,26~196]                    []      (26,)          True
       ## sample sequence_ from model_ beginning with `prefix`
-      sequence = beam_plan(dargs,
-          gpt_model, value_fn, prefix,
-          args.horizon, args.beam_width, args.n_expand, observation_dim, action_dim,
-          discount, args.max_context_transitions, verbose=args.verbose,
-          k_obs=args.k_obs, k_act=args.k_act, cdf_obs=args.cdf_obs, cdf_act=args.cdf_act,
-      )
+      sequence = beam_plan(dargs,args,
+          gpt_model, value_fn, prefix, observation_dim, action_dim, discount)
       ## [ horizon x transition_dim ] convert sampled tokens to continuous trajectory
       sequence_recon = discretizer.reconstruct(sequence)
   
