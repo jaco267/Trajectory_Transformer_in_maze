@@ -47,7 +47,7 @@ This will takes about 15 min on a RTX3060 gpu.
    
 ```sh
 #  It will generate /logs/maze/gpt/pretrained/state_1.pt
-python train.py --max_path_length 61  --n_epochs_ref 1  --n_saves 1   
+python train.py --n_epochs_ref 1  --n_saves 1   
                                #50+10+1 ini_state #maze step max_len +subseq_len+1
 ```
 ### 4. test the agent (planning) 
@@ -96,7 +96,7 @@ python plan.py --horizon 5 --beam_width 64  --seed 36 --enable_breakpoint False 
 ### 5x5 maze
 ```
 python gen_data.py --mode gen --n_steps 1000_000  --time_out 50 --w_h 5
-python train.py --max_path_length 61  --n_epochs_ref 1  --n_saves 1  --n_epochs_ref 1
+python train.py --n_saves 1  --n_epochs_ref 1
 python plan.py --horizon 5 --beam_width 64  --seed 36 --enable_breakpoint False --simulation_game_num 30 --timeout 64
 =====avg_score=-14.1=====
 [-22, -3, -12, -10, -64, -5, -22, -3, -3, -7, -3, -9, -3, -64, -5, -8, -3, -4, -4, -5, -3, -9, -64, -2, -5, -3, -2, -64, -7, -5]

@@ -68,7 +68,6 @@ class SequenceDataset(torch.utils.data.Dataset):
     discount=self.targs.discount
     max_path_length = self.targs.max_path_length
     max_path_length = max_path_length if max_path_length is not -1 else self.dargs.time_out+1
-    breakpoint()
     self.sequence_length = sequence_length; self.step = step  #10  #1  
     self.max_path_length = max_path_length   #?61=time_out + seq_len + 1
     print(f'[datasets/sequence_] Seq len: {sequence_length}, Step: {step}, Max path len: {max_path_length}')      
