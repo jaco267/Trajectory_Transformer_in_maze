@@ -29,11 +29,8 @@ def main(args: PlanConfig):
   targs = load_data_config(gpt_folder, 'train_config.pkl')
   if args.seed != None:  torch.random.manual_seed (args.seed)
   #train_config
-  sequence_length = targs.subsampled_sequence_length * targs.step  #10*1 # same as script/train.py
-  dataset = SequenceDataset(dargs=dargs, data_path=targs.data_path,N=targs.N,
-            max_path_length=targs.max_path_length,
-            sequence_length=sequence_length,
-            step=targs.step,discount=targs.discount)
+  dataset = SequenceDataset(dargs=dargs,targs=targs)
+  # breakpoint()
   config, ckpt, gpt_epoch = load_model(gpt_folder, 
             config_file='train_config.pkl', epoch=args.gpt_epoch)  #todo  merge two train config
   config.update_config(len(dataset),# fix bug of pyrallis (reset the gpt config)

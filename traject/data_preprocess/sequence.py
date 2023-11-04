@@ -4,6 +4,7 @@ from utils import discretization
 from utils.arrays import to_torch
 from maze.data.data import VideoDataset
 from config_data import DataConfig
+from config_train import TrainConfig
 Action_dict = {  0: 'stay',1: 'up',2: 'left',3: 'down',4: 'right'}
 def segment(observations,  #(bs,17+6)=(bs,23)=(bs,obs+action)  #bs==999999
             term_b,     #(bs,1)
@@ -59,12 +60,15 @@ def print_maze(obs,act,term,start,end):
    for i in range(start,end):
       print(obs[i].reshape(w_h,w_h),Action_dict[int(act[i].item())],term[i]),
 class SequenceDataset(torch.utils.data.Dataset):
-  def __init__(self,dargs, data_path,  N=50, sequence_length=250, step=10, 
-               discount=0.99, max_path_length=11):
+  def __init__(self,dargs,targs):
     print(f'[datasets/sequence_] Seq len: {sequence_length}, Step: {step}, Max path len: {max_path_length}')       
-    print(f'[ datasets/sequence_ ] Loading...', end=' ', flush=True)
     self.dargs:DataConfig = dargs
-    dataset = VideoDataset(data_path).get_data()
+    self.targs:TrainConfig = targs
+    dataset = VideoDataset(self.targs.data_path).get_data()
+    sequence_length = self.targs.sequence_length
+    step = self.targs.step
+    discount=self.targs.discount
+    max_path_length = self.targs.max_path_length
     self.sequence_length = sequence_length; self.step = step  #10  #1  
     self.max_path_length = max_path_length   #?61=time_out + seq_len + 1
     obs_b,   act_b, _, rew_b, term_b,_ = get_dataset(dataset)  
@@ -72,13 +76,13 @@ class SequenceDataset(torch.utils.data.Dataset):
     # print_maze(obs_b,act_b,term_b,start=45,end=51)
     #                                                    game1 g2 g3 g4 ...
     #print(np.where(term_b.squeeze()==True)[0][:10])   #[ 50  51  54 105 129 134 185 236 260 267]
+    #** max_seq_len = timeout = 50?
     self.joined_raw = np.concatenate([obs_b, act_b], axis=-1)  #(bs,w_h_2+1)
     self.rewards_raw = rew_b              #(bs,1)
-    ## segment
     print(f'[ datasets/sequence_ ] Segmenting (obs action)...')
     self.joined_segmented, self.termination_flags, self.path_lengths = segment(
         self.joined_raw, term_b, max_path_length)
-    #  (1000,1000,23),  (1000,1000):bool        total tra jnum #[1000,1000,...,999], len==1000
+    #(eps_num,max_path_len,w_h_2+1),  (1000,1000):bool        total tra jnum #[1000,1000,...,999], len==1000
     #  (traj_id, traj_len,dim), term True notTerm False
     print("\nok")
     print(f'[ datasets/sequence_ ] Segmenting (reward)...')
@@ -133,11 +137,9 @@ class SequenceDataset(torch.utils.data.Dataset):
     self.termination_flags = np.concatenate([
         self.termination_flags, np.ones((n_trajectories, sequence_length-1), dtype=bool),
     ], axis=1)  #* (1000,1000+10-1)
-    self.N = N   #100
+    self.N = self.targs.N   #100
      # print(self.joined_raw.shape,"hello") #(999999,23+1+1) = (999999,25)
-    print("ok?3")
-    
-    self.discretizer = discretization.QuantileDiscretizer(self.dargs, self.joined_raw, N)
+    self.discretizer = discretization.QuantileDiscretizer(self.dargs, self.joined_raw, self.N)
   def __len__(self):    return len(self.indices)
   def __getitem__(self, idx:int):
     ##self.indices[(ind:0~1000,i:0~999,i:10~999+10 ),...()] len(1000000-1001)

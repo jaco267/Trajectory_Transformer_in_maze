@@ -1,4 +1,5 @@
-import traject.utils as utils
+from traject.utils.timer import Timer
+
 from z_plan.search import ( beam_plan, make_prefix, extract_actions, update_context, )
 import math
 import torch
@@ -17,7 +18,7 @@ def main_loop(dargs,args,env_maze,timeout,dataset,gpt_model):
   observation_dim = dataset.observation_dim;  #** w*h  
   action_dim = dataset.action_dim
   value_fn = lambda x: discretizer.value_expectation(x) 
-  timer = utils.timer.Timer()
+  timer = Timer()
   #######################
   ###### main loop ######
   #######################
