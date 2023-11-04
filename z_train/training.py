@@ -36,7 +36,7 @@ class Trainer:
       for it, batch in enumerate(loader):
         #** len(batch)==3  shape [(256,189)]*3  -->  x,y,mask
         #** batch [256, 189] = (bs, (w_h**2+3)*seq_len -1) = (bs,(16+3)*10-1)
-        breakpoint()
+        
         batch = to(batch, self.device)#len 3 qkv, batch[0].shape=256,249 == bs,block_size
         # forward the model
         with torch.set_grad_enabled(True):

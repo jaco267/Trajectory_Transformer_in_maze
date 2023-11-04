@@ -4,7 +4,7 @@ from utils import discretization
 from utils.arrays import to_torch
 from maze.data.data import VideoDataset
 from config_data import DataConfig
-
+Action_dict = {  0: 'stay',1: 'up',2: 'left',3: 'down',4: 'right'}
 def segment(observations,  #(bs,17+6)=(bs,23)=(bs,obs+action)  #bs==999999
             term_b,     #(bs,1)
             max_path_length  #1000
@@ -54,6 +54,10 @@ def get_dataset(dataset):
            np.concatenate([obs_flat_b, act_b], axis=-1).shape ,rew_b.shape,
            term_b.shape,">>>>")
     return obs_flat_b, act_b,next_obs_b,rew_b,term_b,realterm_b
+def print_maze(obs,act,term,start,end):
+   w_h = int(obs.shape[-1]**0.5)
+   for i in range(start,end):
+      print(obs[i].reshape(w_h,w_h),Action_dict[int(act[i].item())],term[i]),
 class SequenceDataset(torch.utils.data.Dataset):
   def __init__(self,dargs, data_path,  N=50, sequence_length=250, step=10, 
                discount=0.99, max_path_length=11):
@@ -61,27 +65,15 @@ class SequenceDataset(torch.utils.data.Dataset):
     print(f'[ datasets/sequence_ ] Loading...', end=' ', flush=True)
     self.dargs:DataConfig = dargs
     dataset = VideoDataset(data_path).get_data()
-    '''dataset.keys()
-    (['observations', 'actions', 'next_observations', 'rewards', 'terminals', 'realterminals'])
-np.ndarray(999999,17) (999999,6)  (999999,17)      (999999,1) (999999,1)     (999999,1)
-      fp32                                                         bool          bool
-    '''
-    # breakpoint()
     self.sequence_length = sequence_length; self.step = step  #10  #1  
-    self.max_path_length = max_path_length   #?1000
+    self.max_path_length = max_path_length   #?61=time_out + seq_len + 1
     obs_b,   act_b, _, rew_b, term_b,_ = get_dataset(dataset)  
-    
-    # f32     f32        f32   bool   bool    #type(np.ndarray)
-    #(bs,17)#(bs,6)    (bs,1)  (bs,1) (bs,1):bool  #bs==999999
-    #np.where(term_b.squeeze()==True)  #[999,1999,2999,3999,...998999] #terminal (including timeout)
-    #np.where(real_term_b.squeeze()==True) = []   #real_terminal (not include timeout)
-    self.joined_raw = np.concatenate([obs_b, act_b], axis=-1)  #(bs,17+6)=(bs,23)
+    #(bs,w_h**2) (bs,1)  (bs,1)  (bs,1)bool 
+    # print_maze(obs_b,act_b,term_b,start=45,end=51)
+    #                                                    game1 g2 g3 g4 ...
+    #print(np.where(term_b.squeeze()==True)[0][:10])   #[ 50  51  54 105 129 134 185 236 260 267]
+    self.joined_raw = np.concatenate([obs_b, act_b], axis=-1)  #(bs,w_h_2+1)
     self.rewards_raw = rew_b              #(bs,1)
-    '''
-    if penalty is not None:  ## terminal penalty
-        terminal_mask = realterm_b.squeeze()   
-        self.rewards_raw[terminal_mask] = penalty   #penalty of game over == -100
-    '''
     ## segment
     print(f'[ datasets/sequence_ ] Segmenting (obs action)...')
     self.joined_segmented, self.termination_flags, self.path_lengths = segment(
