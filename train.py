@@ -22,7 +22,7 @@ def main(args: TrainConfig):
   print(f'Dataset size: {len(dataset)}, \
 dim {dataset.observation_dim, dataset.action_dim,dataset.joined_dim}') 
   #len  1000000-1001 #?965972
-  print('######## model ########')    #todo make action_dim to 5
+  print('######## model ########')  
   ##                      obs=w_h**2 , action = 1, joined=w_h**2+1+1+1 = 19 (obs action,reward,done)
   args.update_config(len(dataset),dataset.observation_dim,dataset.action_dim,dataset.joined_dim)
   savedata_config(savepath=(args.savepath,'train_config.pkl'),args=args)#todo rename to train_config

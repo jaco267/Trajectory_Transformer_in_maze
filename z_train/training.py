@@ -26,13 +26,17 @@ class Trainer:
     config:Trainer_config = self.config
     optimizer = self.get_optimizer(model)
     model.train(True)
-    vocab_size = dataset.N
+    vocab_size = dataset.N  #config.N == 100
+    
     loader = DataLoader(dataset, shuffle=True, pin_memory=True,
                         batch_size=config.batch_size,  num_workers=config.num_workers)
     for _ in range(n_epochs):
       losses = []
       timer = Timer()
       for it, batch in enumerate(loader):
+        #** len(batch)==3  shape [(256,189)]*3  -->  x,y,mask
+        #** batch [256, 189] = (bs, (w_h**2+3)*seq_len -1) = (bs,(16+3)*10-1)
+        breakpoint()
         batch = to(batch, self.device)#len 3 qkv, batch[0].shape=256,249 == bs,block_size
         # forward the model
         with torch.set_grad_enabled(True):
@@ -45,7 +49,7 @@ class Trainer:
         optimizer.step()
 
         # decay the learning rate based on our progress
-        if config.lr_decay:
+        if config.lr_decay:   #True
             y = batch[-2]
             self.n_tokens += (y != vocab_size).sum() # number of tokens processed this step
             if self.n_tokens < config.warmup_tokens:

@@ -60,12 +60,7 @@ class SequenceDataset(torch.utils.data.Dataset):
     print(f'[datasets/sequence_] Seq len: {sequence_length}, Step: {step}, Max path len: {max_path_length}')       
     print(f'[ datasets/sequence_ ] Loading...', end=' ', flush=True)
     self.dargs:DataConfig = dargs
-    '''
-    self.env = env = load_environment(env);self.device = device  #* d4rl
-    dataset = qlearning_dataset_with_timeouts(env.unwrapped, terminate_on_end=True) #* d4rl
-    '''
     dataset = VideoDataset(data_path).get_data()
-    
     '''dataset.keys()
     (['observations', 'actions', 'next_observations', 'rewards', 'terminals', 'realterminals'])
 np.ndarray(999999,17) (999999,6)  (999999,17)      (999999,1) (999999,1)     (999999,1)
