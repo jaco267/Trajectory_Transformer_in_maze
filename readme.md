@@ -93,3 +93,12 @@ python plan.py --horizon 5 --beam_width 64  --seed 36 --enable_breakpoint False 
 =====avg_score=-18.8=====
 # [-2, -1, -50, -50, -1, -2, -4, -2, -5, -50, -2, -50, -1, -3, -50, -3, -3, -50, -1, -50, -5, -50, -50, -1, -12, -50, -1, -3, -1, -11]
 ```
+### 5x5 maze
+```
+python gen_data.py --mode gen --n_steps 1000_000  --time_out 50 --w_h 5
+python train.py --max_path_length 61  --n_epochs_ref 1  --n_saves 1  --n_epochs_ref 1
+python plan.py --horizon 5 --beam_width 64  --seed 36 --enable_breakpoint False --simulation_game_num 30 --timeout 64
+=====avg_score=-14.1=====
+[-22, -3, -12, -10, -64, -5, -22, -3, -3, -7, -3, -9, -3, -64, -5, -8, -3, -4, -4, -5, -3, -9, -64, -2, -5, -3, -2, -64, -7, -5]
+```
+### 7x7 maze

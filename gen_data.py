@@ -26,6 +26,7 @@ def main(c: DataConfig):
   # data[19]
   savedata_config(savepath=(c.data_path,'data_config.pkl'),args=c)
   print_data_maze(c,data,idx=11)
+  print(f"---data generated successfully in {c.data_path}---")
   print("""
 ---------type the following code----------
         

@@ -1,10 +1,6 @@
-import sys
-import os
-cwd = os.getcwd()
-sys.path.append(cwd)
 import torch
-
 import traject.utils as utils
+from z_train.training import Trainer
 from traject.data_preprocess.sequence import SequenceDataset
 from traject.models.transformers import GPT
 import pyrallis    #nice cmd config tool
@@ -35,7 +31,7 @@ dim {dataset.observation_dim, dataset.action_dim,dataset.joined_dim}')
   #tokens per epoch=len(dataset)* (seq_len*state_dim)
   
   # breakpoint()
-  trainer = utils.Trainer(args.trainer_config)
+  trainer = Trainer(args.trainer_config)
   ###### main loop ######
   ## scale number of epochs to keep number of updates constant
   n_epochs =  args.n_epochs_ref     

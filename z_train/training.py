@@ -4,9 +4,7 @@ if TYPE_CHECKING:  from my_conf.config_train import Trainer_config
 import math
 import torch
 from torch.utils.data.dataloader import DataLoader
-import pdb
-
-from .timer import Timer
+from traject.utils.timer import Timer
 
 def to(xs, device):
     return [x.to(device) for x in xs]
