@@ -61,16 +61,17 @@ def print_maze(obs,act,term,start,end):
       print(obs[i].reshape(w_h,w_h),Action_dict[int(act[i].item())],term[i]),
 class SequenceDataset(torch.utils.data.Dataset):
   def __init__(self,dargs,targs):
-    print(f'[datasets/sequence_] Seq len: {sequence_length}, Step: {step}, Max path len: {max_path_length}')       
-    self.dargs:DataConfig = dargs
-    self.targs:TrainConfig = targs
+    self.dargs:DataConfig = dargs;  self.targs:TrainConfig = targs
     dataset = VideoDataset(self.targs.data_path).get_data()
     sequence_length = self.targs.sequence_length
     step = self.targs.step
     discount=self.targs.discount
     max_path_length = self.targs.max_path_length
+    max_path_length = max_path_length if max_path_length is not -1 else self.dargs.time_out+1
+    breakpoint()
     self.sequence_length = sequence_length; self.step = step  #10  #1  
     self.max_path_length = max_path_length   #?61=time_out + seq_len + 1
+    print(f'[datasets/sequence_] Seq len: {sequence_length}, Step: {step}, Max path len: {max_path_length}')      
     obs_b,   act_b, _, rew_b, term_b,_ = get_dataset(dataset)  
     #(bs,w_h**2) (bs,1)  (bs,1)  (bs,1)bool 
     # print_maze(obs_b,act_b,term_b,start=45,end=51)

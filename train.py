@@ -17,7 +17,6 @@ def main(targs: TrainConfig):
   dataset = SequenceDataset(dargs=dargs,targs=targs)
   print(f'Dataset size: {len(dataset)}, \
 dim {dataset.observation_dim, dataset.action_dim,dataset.joined_dim}') 
-  #len  1000000-1001 #?965972
   print('######## model ########')  
   ##                      obs=w_h**2 , action = 1, joined=w_h**2+1+1+1 = 19 (obs action,reward,done)
   targs.update_config(len(dataset),dataset.observation_dim,dataset.action_dim,dataset.joined_dim)

@@ -49,7 +49,7 @@ class TrainConfig:
     #** ---transformer---
     n_embd:int = n_embd;
     subsampled_sequence_length:int = subsampled_sequence_length; 
-    max_path_length:int = 11 #maze step max_len +subseq_len+1 
+    max_path_length:int = -1 #maze step max_len +subseq_len+1  ex.51 
     #** ---submodule---
     trainer_config:Trainer_config = Trainer_config
     gpt_config:GPT_config = GPT_config
