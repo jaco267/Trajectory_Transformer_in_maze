@@ -5,25 +5,37 @@ import math
 import torch
 from torch.utils.data.dataloader import DataLoader
 from traject.utils.timer import Timer
-
+from config_data import DataConfig
+Action_dict = {  0: 'stay',1: 'up',2: 'left',3: 'down',4: 'right'}
 def to(xs, device):
     return [x.to(device) for x in xs]
-
+def get_seq_maze(seq_data_X,seq_data_Y,w_h,idx):
+   seq_x = seq_data_X[idx]  #(seq_len*trans_dim -1,)
+   seq_y = seq_data_Y[idx]  #(seq_len*trans_dim -1,)
+   seq_data_raw = torch.cat((seq_x,seq_y[-1].reshape(1))) ##(seq_len*trans_dim,)
+   trans_dim =int( w_h**2 + 1+1+1)
+   seq_data = seq_data_raw.reshape(-1,trans_dim)
+   seq_len = seq_data.shape[0]
+   for trans in seq_data:
+      print(trans[0:-3].reshape(w_h,w_h),"action:",Action_dict[trans[-3].item()],
+            "value:",-trans[-1].item())
 class Trainer:
-  def __init__(self, config):
-    self.config:Trainer_config = config
-    self.device = config.device
-
+  def __init__(self, targs, dargs):
+    self.targs:Trainer_config = targs
+    self.dargs:DataConfig = dargs
+    self.device = targs.device
+    self.w_h = self.dargs.w_h
+    self.w_h_2 = self.w_h**2
     self.n_epochs = 0
     self.n_tokens = 0 # counter used for learning rate decay
     self.optimizer = None
   def get_optimizer(self, model):
     if self.optimizer is None:
         print(f'[ utils/training ] Making optimizer at epoch {self.n_epochs}')
-        self.optimizer = model.configure_optimizers(self.config)
+        self.optimizer = model.configure_optimizers(self.targs)
     return self.optimizer
   def train(self, model, dataset, n_epochs=1, log_freq=100):
-    config:Trainer_config = self.config
+    config:Trainer_config = self.targs
     optimizer = self.get_optimizer(model)
     model.train(True)
     vocab_size = dataset.N  #config.N == 100
@@ -34,9 +46,9 @@ class Trainer:
       losses = []
       timer = Timer()
       for it, batch in enumerate(loader):
-        #** len(batch)==3  shape [(256,189)]*3  -->  x,y,mask
-        #** batch [256, 189] = (bs, (w_h**2+3)*seq_len -1) = (bs,(16+3)*10-1)
-        
+        #** len(batch)==3  shape [(bs,seq_l*trans_dim)]*3  -->  x,y,mask
+        ## batch (bs,  seq_l * trans_dim) = (bs,  10*(w_h^2+1+1+1)
+        # get_seq_maze(batch[0],batch[1],self.w_h,idx=0) #todo
         batch = to(batch, self.device)#len 3 qkv, batch[0].shape=256,249 == bs,block_size
         # forward the model
         with torch.set_grad_enabled(True):

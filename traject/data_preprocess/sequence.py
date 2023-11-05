@@ -113,7 +113,6 @@ class SequenceDataset(torch.utils.data.Dataset):
         end = length - 1
         for i in range(end):
             indices.append((path_ind, i, i+self.seq_len))
-    breakpoint()
     # print(indices)  #[(ind:0~999,i:0~998,i:10~999+10 ),(),...] len(1000000-1001)
     # print(len(indices),"wejkejrkejrk")
     self.indices = np.array(indices)  #999*999 + 998 - 998999,  self.indices.shape= (998999,3)
@@ -125,10 +124,10 @@ class SequenceDataset(torch.utils.data.Dataset):
     #*** this is what the __getitem__ get
     self.joined_segmented = np.concatenate([
         self.joined_segmented, np.zeros((n_trajectories, self.seq_len-1, joined_dim)),
-    ], axis=1)  #*(1000,1000+10-1,25)
+    ], axis=1)  #*(eps_id,timeout+seq_len,25)
     self.term_flags = np.concatenate([
         self.term_flags, np.ones((n_trajectories, self.seq_len-1), dtype=bool),
-    ], axis=1)  #* (1000,1000+10-1)
+    ], axis=1)  #* (eps_id,timeout+seq_len)
     self.N = self.targs.N   #100
      # print(self.joined_raw.shape,"hello") #(999999,23+1+1) = (999999,25)
     self.discretizer = discretization.QuantileDiscretizer(self.dargs, self.joined_raw, self.N)
@@ -137,10 +136,11 @@ class SequenceDataset(torch.utils.data.Dataset):
     ##self.indices[(ind:0~1000,i:0~999,i:10~999+10 ),...()] len(1000000-1001)
     #int         int      int
     path_ind, start_ind, end_ind = self.indices[idx]
-    #joined_segmented(1000,1000+10-1,25)  #self.step=1          #step = 1
+    #joined_segmented(eps_id,timeout+seq_len,w_h^2+3)  #self.step=1          #step = 1
     joined=self.joined_segmented[path_ind,start_ind:end_ind:self.step]
-    #joined=[seq_l,trans_dim]=(10,19)    #              i:(i+seq_len)  i:(i+10)
-    #termin_flags  (1000,1000+10-1)
+    #joined=[seq_l,trans_dim]=(seq_l,w_h^2+3)    #i:(i+seq_l)  i:(i+10)
+
+    #termin_flags  (eps_id,timeout+seq_len)
     terminations = self.term_flags[path_ind, start_ind:end_ind:self.step]
     #term = (10,)  # [False]*10 
     joined_discrete = self.discretizer.discretize(joined)  #discretized along each dimension
@@ -173,10 +173,9 @@ class SequenceDataset(torch.utils.data.Dataset):
     joined_discrete = joined_discrete.view(-1)  #(25*10,)
     mask = mask.view(-1)
 
-    X = joined_discrete[:-1]  #src
+    X = joined_discrete[:-1]  #src  #seq_l * trans_dim = (10*(w_h^2+1+1+1)
     Y = joined_discrete[1:]   #tgt
     mask = mask[:-1]
-
     return X, Y, mask
 
       

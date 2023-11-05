@@ -1,5 +1,4 @@
 import torch
-import traject.utils as utils
 from z_train.training import Trainer
 from traject.data_preprocess.sequence import SequenceDataset
 from traject.models.transformers import GPT
@@ -26,7 +25,7 @@ dim {dataset.observation_dim, dataset.action_dim,dataset.joined_dim}')
   #tokens per epoch=len(dataset)* (seq_len*state_dim)
   
   # breakpoint()
-  trainer = Trainer(targs.trainer_config)
+  trainer = Trainer(targs.trainer_config,dargs)
   ###### main loop ######
   ## scale number of epochs to keep number of updates constant
   n_epochs =  targs.n_epochs_ref     
