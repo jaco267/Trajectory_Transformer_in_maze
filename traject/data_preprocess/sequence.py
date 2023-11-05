@@ -63,40 +63,37 @@ class SequenceDataset(torch.utils.data.Dataset):
   def __init__(self,dargs,targs):
     self.dargs:DataConfig = dargs;  self.targs:TrainConfig = targs
     dataset = VideoDataset(self.targs.data_path).get_data()
-    sequence_length = self.targs.sequence_length
-    step = self.targs.step
-    discount=self.targs.discount
-    max_path_length = self.targs.max_path_length
-    max_path_length = max_path_length if max_path_length is not -1 else self.dargs.time_out+1
-    self.sequence_length = sequence_length; self.step = step  #10  #1  
-    self.max_path_length = max_path_length   #?61=time_out + seq_len + 1
-    print(f'[datasets/sequence_] Seq len: {sequence_length}, Step: {step}, Max path len: {max_path_length}')      
+    self.seq_len = self.targs.sequence_length ; #10 
+    self.step = self.targs.step    #1  
+    discount=self.targs.discount  #0.99
+    max_path_len=targs.max_path_length if targs.max_path_length is not -1 else self.dargs.time_out+1
+    self.max_path_len = max_path_len  #time_out + 1
+    print(f'Seq len: {self.seq_len}, Step: {self.step}, Max path: {self.max_path_len}')      
     obs_b,   act_b, _, rew_b, term_b,_ = get_dataset(dataset)  
     #(bs,w_h**2) (bs,1)  (bs,1)  (bs,1)bool 
     # print_maze(obs_b,act_b,term_b,start=45,end=51)
     #                                                    game1 g2 g3 g4 ...
     #print(np.where(term_b.squeeze()==True)[0][:10])   #[ 50  51  54 105 129 134 185 236 260 267]
-    #** max_seq_len = timeout = 50?
     self.joined_raw = np.concatenate([obs_b, act_b], axis=-1)  #(bs,w_h_2+1)
     self.rewards_raw = rew_b              #(bs,1)
     print(f'[ datasets/sequence_ ] Segmenting (obs action)...')
     self.joined_segmented, self.termination_flags, self.path_lengths = segment(
-        self.joined_raw, term_b, max_path_length)
+        self.joined_raw, term_b, max_path_len)
     #(eps_num,max_path_len,w_h_2+1),  (1000,1000):bool        total tra jnum #[1000,1000,...,999], len==1000
     #  (traj_id, traj_len,dim), term True notTerm False
     print("\nok")
     print(f'[ datasets/sequence_ ] Segmenting (reward)...')
-    self.rewards_segmented, *_ = segment(self.rewards_raw, term_b, max_path_length)
+    self.rewards_segmented, *_ = segment(self.rewards_raw, term_b, max_path_len)
     #     (1000,1000,1)  
     print("\nok")
     self.discount = discount  #0.99
-    self.discounts = (discount ** np.arange(self.max_path_length))[:,None]
+    self.discounts = (discount ** np.arange(self.max_path_len))[:,None]
     #      [1,0.99,0.98,....0.01] len(1000)             
 
     ## [ n_paths x max_path_length x 1 ]
     self.values_segmented = np.zeros(self.rewards_segmented.shape)
 
-    for t in range(max_path_length):
+    for t in range(max_path_len):
         ## [ n_paths x 1 ]
         # print(t,self.rewards_segmented[:,],self.discounts[:-1])
         #t=0             v0 = r1 + r2*0.99+r3*0.98 +....r1000*0.01
@@ -121,7 +118,7 @@ class SequenceDataset(torch.utils.data.Dataset):
         print(f"\r{path_ind}/{ll}",end='')
         end = length - 1
         for i in range(end):
-            indices.append((path_ind, i, i+sequence_length))
+            indices.append((path_ind, i, i+self.seq_len))
     # print(indices)  #[(ind:0~999,i:0~998,i:10~999+10 ),(),...] len(1000000-1001)
     # print(len(indices),"wejkejrkejrk")
     self.indices = np.array(indices)  #999*999 + 998 - 998999,  self.indices.shape= (998999,3)
@@ -132,10 +129,10 @@ class SequenceDataset(torch.utils.data.Dataset):
     n_trajectories, _, joined_dim = self.joined_segmented.shape #[1000,1000,25]
     #*** this is what the __getitem__ get
     self.joined_segmented = np.concatenate([
-        self.joined_segmented, np.zeros((n_trajectories, sequence_length-1, joined_dim)),
+        self.joined_segmented, np.zeros((n_trajectories, self.seq_len-1, joined_dim)),
     ], axis=1)  #*(1000,1000+10-1,25)
     self.termination_flags = np.concatenate([
-        self.termination_flags, np.ones((n_trajectories, sequence_length-1), dtype=bool),
+        self.termination_flags, np.ones((n_trajectories, self.seq_len-1), dtype=bool),
     ], axis=1)  #* (1000,1000+10-1)
     self.N = self.targs.N   #100
      # print(self.joined_raw.shape,"hello") #(999999,23+1+1) = (999999,25)
@@ -176,7 +173,7 @@ class SequenceDataset(torch.utils.data.Dataset):
     #                        0~999      0~999+10
     traj_inds = torch.arange(start_ind, end_ind, self.step)
     mask = torch.ones(joined_discrete.shape, dtype=torch.bool)  #mask(10,25) #
-    mask[traj_inds > self.max_path_length - self.step] = 0
+    mask[traj_inds > self.max_path_len - self.step] = 0
     ## flatten everything
     joined_discrete = joined_discrete.view(-1)  #(25*10,)
     mask = mask.view(-1)
