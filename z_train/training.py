@@ -6,19 +6,10 @@ import torch
 from torch.utils.data.dataloader import DataLoader
 from traject.utils.timer import Timer
 from config_data import DataConfig
-Action_dict = {  0: 'stay',1: 'up',2: 'left',3: 'down',4: 'right'}
+from z_train.print_maze import get_seq_maze
 def to(xs, device):
     return [x.to(device) for x in xs]
-def get_seq_maze(seq_data_X,seq_data_Y,w_h,idx):
-   seq_x = seq_data_X[idx]  #(seq_len*trans_dim -1,)
-   seq_y = seq_data_Y[idx]  #(seq_len*trans_dim -1,)
-   seq_data_raw = torch.cat((seq_x,seq_y[-1].reshape(1))) ##(seq_len*trans_dim,)
-   trans_dim =int( w_h**2 + 1+1+1)
-   seq_data = seq_data_raw.reshape(-1,trans_dim)
-   seq_len = seq_data.shape[0]
-   for trans in seq_data:
-      print(trans[0:-3].reshape(w_h,w_h),"action:",Action_dict[trans[-3].item()],
-            "value:",-trans[-1].item())
+
 class Trainer:
   def __init__(self, targs, dargs):
     self.targs:Trainer_config = targs
@@ -48,7 +39,7 @@ class Trainer:
       for it, batch in enumerate(loader):
         #** len(batch)==3  shape [(bs,seq_l*trans_dim)]*3  -->  x,y,mask
         ## batch (bs,  seq_l * trans_dim) = (bs,  10*(w_h^2+1+1+1)
-        # get_seq_maze(batch[0],batch[1],self.w_h,idx=0) #todo
+        # get_seq_maze(batch[0],batch[1],self.w_h,idx=0) #* uncomment this to print maze
         batch = to(batch, self.device)#len 3 qkv, batch[0].shape=256,249 == bs,block_size
         # forward the model
         with torch.set_grad_enabled(True):

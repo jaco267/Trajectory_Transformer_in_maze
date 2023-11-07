@@ -39,7 +39,8 @@ class GPT_config:
 class TrainConfig:
     seed:int = 42;  device:str = device;    
     ## number of epochs for a 1M-size datasets; n_epochs = 1M / dataset_size * n_epochs_ref   
-    n_epochs_ref:int = 50;    n_saves:int = 3
+    n_epochs_ref:int = 1;  #50    
+    n_saves:int = 1; #3
     #** ----datasets----
     savepath:str = 'logs/maze/gpt/pretrained' 
     data_path:str =  'datasets/maze/'
