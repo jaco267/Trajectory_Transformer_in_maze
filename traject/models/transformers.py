@@ -8,6 +8,7 @@ from torch.nn import functional as F
 
 from .ein import EinLinear
 from z_train.print_maze import get_seq_maze
+from config_data import DataConfig
 class CausalSelfAttention(nn.Module):
     def __init__(self, cfg):
         super().__init__()
@@ -91,9 +92,11 @@ class Block(nn.Module):
 
 class GPT(nn.Module):
   """  the full GPT language model, with a context size of block_size """
-  def __init__(self, cfg):
+  def __init__(self, cfg, dargs):
     super().__init__()
     # input embedding stem (+1 for stop token)
+    self.dargs:DataConfig = dargs
+    self.w_h = dargs.w_h
     #*                                   100 * 25 (obs+action...),   n_emb=n_emb*n_head = 32*4 = 128
     self.tok_emb = nn.Embedding(cfg.vocab_size * cfg.transition_dim + 1, cfg.n_embd)
     self.pos_emb = nn.Parameter(torch.zeros(1, cfg.block_size, cfg.n_embd))  
@@ -222,8 +225,7 @@ class GPT(nn.Module):
         idx : [ B x T ]
         values : [ B x 1 x 1 ]
     """
-    get_seq_maze(idx[0],idx[1],self.w_h,idx=0)
-    breakpoint()
+    get_seq_maze(idx,targets, self.w_h,idx=0)  
     b, t = idx.size()  #** (256,249) = (bs,block_size) = (bs, trans_dim*seq_len-1) = (bs,25*10 -1)
     #*** idx.dtype == int64
     assert t <= self.block_size, "Cannot forward, model block size is exhausted."

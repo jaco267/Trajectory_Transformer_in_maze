@@ -19,7 +19,7 @@ class Trainer_config:
     device:str=device  #** should be smae as TrainConfig
 @dataclass
 class GPT_config:
-    #* traject.models.transformer.GPT
+    #* traject.models.transformer.GPT_
     ## discretization
     vocab_size:int=N  
     block_size:int = None  #** subsampled_sequence_length * trans_dim -1 =249

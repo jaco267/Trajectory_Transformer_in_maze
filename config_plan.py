@@ -18,8 +18,8 @@ class PlanConfig:
     timeout:int = 50;
     seed:int = None;
     plan_freq:int = 1
-    horizon:int = 15   
-    beam_width:int = 128
+    horizon:int = 5   
+    beam_width:int = 64 #128
     n_expand:int = 2
     enable_breakpoint:bool = True
     k_obs:int = 1

@@ -26,18 +26,15 @@ def maze_state_to_obs(maze_state):
 def main(args: PlanConfig):  
   dargs:DataConfig = load_data_config(args.data_path,'data_config.pkl')
   gpt_folder = args.gpt_folder
-  targs = load_data_config(gpt_folder, 'train_config.pkl')
   if args.seed != None:  torch.random.manual_seed (args.seed)
-  #train_config
-  dataset = SequenceDataset(dargs=dargs,targs=targs)
-  # breakpoint()
-  config, ckpt, gpt_epoch = load_model(gpt_folder, 
+  targs, ckpt, gpt_epoch = load_model(gpt_folder, 
             config_file='train_config.pkl', epoch=args.gpt_epoch)  #todo  merge two train config
-  config.update_config(len(dataset),# fix bug of pyrallis (reset the gpt config)
+  dataset = SequenceDataset(dargs=dargs,targs=targs)
+  targs.update_config(len(dataset),# fix bug of pyrallis (reset the gpt config)
                 dataset.observation_dim, dataset.action_dim, dataset.joined_dim)
   # breakpoint()#config.gpt_config.block_size #config.observation_dim=7 #config.n_layer
-  config = config.gpt_config
-  model = GPT(config)
+  gpt_args = targs.gpt_config
+  model = GPT(gpt_args,dargs)
   model.to(args.device)
   model.load_state_dict(ckpt, strict=True)
   ####### dataset #######

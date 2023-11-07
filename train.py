@@ -20,7 +20,7 @@ dim {dataset.observation_dim, dataset.action_dim,dataset.joined_dim}')
   ##                      obs=w_h**2 , action = 1, joined=w_h**2+1+1+1 = 19 (obs action,reward,done)
   targs.update_config(len(dataset),dataset.observation_dim,dataset.action_dim,dataset.joined_dim)
   savedata_config(savepath=(targs.savepath,'train_config.pkl'),args=targs)
-  model = GPT(targs.gpt_config).to(targs.device);
+  model = GPT(targs.gpt_config,dargs).to(targs.device);
   print('####### trainer #######')
   #tokens per epoch=len(dataset)* (seq_len*state_dim)
   
